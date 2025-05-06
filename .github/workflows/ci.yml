@@ -14,10 +14,10 @@ jobs:
       - name: Репозитори татах
         uses: actions/checkout@v3
 
-      - name: Java 11 суулгах
+      - name: Java 17 суулгах
         uses: actions/setup-java@v4
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
 
       - name: Maven-ээр төсөл build хийх
