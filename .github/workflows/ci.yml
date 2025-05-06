@@ -1,29 +1,38 @@
-name: Java Maven CI
+name: Java CI with Maven
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main, feature/** ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Репозитори татах
+        uses: actions/checkout@v3
 
-    - name: Set up JDK 11
-      uses: actions/setup-java@v2
-      with:
-        java-version: '11'
-        distribution: 'adoptopenjdk'
+      - name: Java 11 суулгах
+        uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
 
-    - name: Build with Maven
-      run: mvn clean install
+      - name: Maven-ээр төсөл build хийх
+        run: mvn -B clean verify
 
-    - name: Run tests
-      run: mvn test
+      - name: Checkstyle шалгалт
+        run: mvn checkstyle:check
+
+      - name: JaCoCo coverage шалгалт
+        run: mvn jacoco:report
+
+      - name: Coverage 100% шалгах
+        run: |
+          coverage=$(grep -oPm1 "(?<=<branchCoverage>)[^<]+" target/site/jacoco/jacoco.xml | tr -d '%')
+          if [ "$coverage" != "100" ]; then
+            echo "Branch coverage 100% биш байна: $coverage%"
+            exit 1
+          fi
