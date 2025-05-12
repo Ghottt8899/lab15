@@ -31,8 +31,12 @@ jobs:
 
       - name: Coverage 100% шалгах
         run: |
-          coverage=$(grep -oPm1 "(?<=<branchCoverage>)[^<]+" target/site/jacoco/jacoco.xml | tr -d '%')
-          if [ "$coverage" != "100" ]; then
-            echo "Branch coverage 100% биш байна: $coverage%"
+          covered=$(grep -oPm1 '(?<=<counter type="BRANCH">.*?<covered>)[0-9]+' target/site/jacoco/jacoco.xml)
+          missed=$(grep -oPm1 '(?<=<counter type="BRANCH">.*?<missed>)[0-9]+' target/site/jacoco/jacoco.xml)
+          total=$((covered + missed))
+          percent=$((100 * covered / total))
+          echo "Branch coverage: $percent%"
+          if [ "$percent" -ne 100 ]; then
+            echo "Branch coverage 100% биш байна: ${percent}%"
             exit 1
           fi
