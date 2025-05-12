@@ -31,8 +31,8 @@ jobs:
 
       - name: Coverage 100% шалгах
         run: |
-          covered=$(grep -oPm1 '(?<=<counter type="BRANCH">.*?<covered>)[0-9]+' target/site/jacoco/jacoco.xml)
-          missed=$(grep -oPm1 '(?<=<counter type="BRANCH">.*?<missed>)[0-9]+' target/site/jacoco/jacoco.xml)
+          covered=$(awk '/<counter type="BRANCH">/,/<\/counter>/ { if ($0 ~ /<covered>/) { gsub(/.*<covered>|<\/covered>.*/, "", $0); print $0 } }' target/site/jacoco/jacoco.xml)
+          missed=$(awk '/<counter type="BRANCH">/,/<\/counter>/ { if ($0 ~ /<missed>/) { gsub(/.*<missed>|<\/missed>.*/, "", $0); print $0 } }' target/site/jacoco/jacoco.xml)
           total=$((covered + missed))
           percent=$((100 * covered / total))
           echo "Branch coverage: $percent%"
